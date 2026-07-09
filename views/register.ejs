@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl border border-slate-700 overflow-hidden p-8">
+        
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-500/10 text-blue-400 mb-3 ring-8 ring-blue-500/5">
+                <i class="fa-solid fa-user-plus text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white tracking-tight">Crear Cuenta</h2>
+            <p class="text-slate-400 text-sm mt-1">Regístrate en el Sistema de Control de Accesos</p>
+        </div>
+
+        <form action="/auth/register" method="POST" class="space-y-5">
+            
+            <div>
+                <label for="nombre" class="block text-sm font-medium text-slate-300 mb-1.5">Nombre Completo</label>
+                <div class="relative rounded-lg shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <input type="text" id="nombre" name="nombre" required
+                        class="block w-full pl-10 pr-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm" 
+                        placeholder="Juan Pérez">
+                </div>
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Correo Electrónico</label>
+                <div class="relative rounded-lg shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <input type="email" id="email" name="email" required
+                        class="block w-full pl-10 pr-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm" 
+                        placeholder="tu_correo@espe.edu.ec">
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">Contraseña</label>
+                <div class="relative rounded-lg shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <input type="password" id="password" name="password" required
+                        class="block w-full pl-10 pr-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <button type="submit" 
+                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-blue-500 transition-all duration-150 active:scale-[0.98]">
+                Registrar Cuenta
+            </button>
+        </form>
+
+        <div class="mt-6 pt-5 border-t border-slate-700 text-center">
+            <p class="text-sm text-slate-400">
+                ¿Ya tienes una cuenta? 
+                <a href="/login" class="font-medium text-blue-400 hover:text-blue-300 transition-colors ml-1">Inicia sesión aquí</a>
+            </p>
+        </div>
+
+    </div>
+
+</body>
+</html>

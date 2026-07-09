@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 min-h-screen text-slate-100 flex flex-col">
+
+    <nav class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-emerald-500 text-slate-900 p-2 rounded-lg font-bold">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <span class="text-lg font-semibold tracking-wide text-white">ESPE - Control de Accesos</span>
+            </div>
+            <a href="/login" class="inline-flex items-center space-x-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-4 py-2 rounded-lg border border-rose-500/20 text-sm font-medium transition-colors">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+        
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-md">
+            <div class="flex items-start space-x-4">
+                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                    <i class="fa-solid fa-circle-check text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white">¡Autenticación Básica Exitosa!</h1>
+                    <p class="text-slate-400 mt-1">Te has autenticado correctamente en el sistema web base. Los mecanismos criptográficos básicos de integridad están activos.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/10">Pendiente</span>
+                        <i class="fa-solid fa-key text-slate-500"></i>
+                    </div>
+                    <h3 class="text-base font-semibold text-white">Control de Acceso Avanzado</h3>
+                    <p class="text-slate-400 text-sm mt-2">Próximamente: Integración de OAuth 2.0, Autenticación Centralizada con Kerberos y MFA (Google Authenticator).</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/10">Pendiente</span>
+                        <i class="fa-solid fa-eye text-slate-500"></i>
+                    </div>
+                    <h3 class="text-base font-semibold text-white">Monitoreo y SIEM</h3>
+                    <p class="text-slate-400 text-sm mt-2">Próximamente: Correlación de eventos críticos mediante Wazuh e IDS/IPS alineados con MITRE ATT&CK.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/10">Pendiente</span>
+                        <i class="fa-solid fa-server text-slate-500"></i>
+                    </div>
+                    <h3 class="text-base font-semibold text-white">Alta Disponibilidad</h3>
+                    <p class="text-slate-400 text-sm mt-2">Próximamente: Implementación de redundancia y failover automático mediante Keepalived.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
