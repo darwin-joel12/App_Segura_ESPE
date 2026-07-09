@@ -33,8 +33,6 @@ El sistema consiste en una aplicación web segura orientada al control de acceso
 
 ## Guía de Instalación y Despliegue Local (Para Colaboradores)
 
-Si eres otro desarrollador del equipo o el docente revisando el proyecto, sigue estos pasos detallados para configurarlo en tu máquina desde cero:
-
 ### 1. Clonar el Proyecto e Instalar Dependencias
 Abre tu terminal o consola de comandos, ubícate en la carpeta donde deseas guardar el proyecto y ejecuta los siguientes comandos:
 
