@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl border border-slate-700 p-8 text-center">
+        
+        <!-- Icono de Seguridad -->
+        <div class="mb-6">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/10 text-amber-400 mb-3 ring-8 ring-amber-500/5">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white tracking-tight">Verificación de Identidad</h2>
+            <p class="text-slate-400 text-sm mt-1">Se requiere el segundo factor de autenticación (MFA)</p>
+        </div>
+
+        <p class="text-slate-300 text-sm mb-6">
+            Ingresa el código dinámico de 6 dígitos generado por tu aplicación <strong>Google Authenticator</strong>.
+        </p>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="mb-4 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span><%= error %></span>
+            </div>
+        <% } %>
+
+        <!-- Formulario POST hacia la validación del MFA -->
+        <form action="/auth/verificar-mfa" method="POST" class="space-y-6">
+            <div>
+                <input type="text" 
+                       name="codigoMfa" 
+                       placeholder="000000" 
+                       maxlength="6"
+                       required
+                       autofocus
+                       class="w-full text-center tracking-[0.5em] text-2xl font-mono bg-slate-900 border border-slate-700 rounded-lg py-3 px-4 text-amber-400 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+            </div>
+
+            <button type="submit" 
+                class="w-full inline-flex justify-center py-3 px-4 rounded-lg shadow-sm text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-all duration-150">
+                Verificar Código
+            </button>
+        </form>
+
+    </div>
+
+</body>
+</html>

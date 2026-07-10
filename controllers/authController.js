@@ -69,39 +69,88 @@ exports.registrarUsuario = async (req, res) => {
  * - Busca el usuario por su correo electrónico.
  * - Valida la coincidencia de la contraseña provista usando la comparación segura de hashes.
  */
+
 exports.loginUsuario = async (req, res) => {
     const { email, password } = req.body;
 
-    // Validación básica de campos obligatorios
     if (!email || !password) {
         return res.status(400).send('Todos los campos son obligatorios.');
     }
 
     try {
-        // 1. Buscar al usuario dentro de la tabla en base a su correo electrónico
         const [usuarios] = await db.query('SELECT * FROM usuarios WHERE email = ?', [email]);
-        
-        // Control de mitigación contra enumeración de usuarios: mensaje genérico por seguridad
+
         if (usuarios.length === 0) {
             return res.status(400).send('El correo electrónico o la contraseña son incorrectos.');
         }
 
         const usuario = usuarios[0];
-
-        // 2. Comparar de forma segura la contraseña ingresada con el Hash almacenado
         const coinciden = await bcrypt.compare(password, usuario.password);
 
         if (!coinciden) {
             return res.status(400).send('El correo electrónico o la contraseña son incorrectos.');
         }
 
-        console.log(`[AUDITORÍA] Credenciales básicas válidas para: ${email}. Redirigiendo a verificación.`);
-        
-        // 3. Por ahora, redirige temporalmente directo al Dashboard
-        res.redirect('/dashboard');
+        // En lugar de iniciar sesión definitiva, guardamos los datos de forma TEMPORAL
+        req.session.usuarioIdTemp = usuario.id;
+        req.session.usuarioEmailTemp = usuario.email;
+        req.session.usuarioNombreTemp = usuario.nombre;
+
+        console.log(`[AUDITORÍA] Credenciales correctas para: ${email}. Pasando a verificación MFA.`);
+
+        // Redirigir a la pantalla del código de 6 dígitos
+        res.redirect('/verificar-mfa');
 
     } catch (error) {
-        console.error('[ERROR CRÍTICO EN LOGIN]:', error);
+        console.error('[ERROR LOGIN]:', error);
         res.status(500).send('Error interno al intentar iniciar sesión.');
+    }
+};
+
+// Nueva función para verificar el código de 6 dígitos enviado por el usuario
+exports.verificarMfa = async (req, res) => {
+    const { codigoMfa } = req.body;
+    const usuarioId = req.session.usuarioIdTemp;
+
+    if (!usuarioId) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const [usuarios] = await db.query('SELECT mfa_secret FROM usuarios WHERE id = ?', [usuarioId]);
+        const usuario = usuarios[0];
+
+        const verificado = speakeasy.totp.verify({
+            secret: usuario.mfa_secret,
+            encoding: 'base32',
+            token: codigoMfa,
+            window: 1 
+        });
+
+        if (verificado) {
+            req.session.usuarioId = req.session.usuarioIdTemp;
+            req.session.usuarioNombre = req.session.usuarioNombreTemp;
+            req.session.usuarioEmail = req.session.usuarioEmailTemp;
+
+            delete req.session.usuarioIdTemp;
+
+            console.log(`[AUDITORÍA] Verificación MFA exitosa para usuario ID: ${usuarioId}.`);
+            res.redirect('/dashboard');
+        } else {
+            console.log(`[AUDITORÍA ALERT] Intento de verificación MFA fallido para usuario ID: ${usuarioId}.`);
+            
+            // 🔄 EN LUGAR DE ENVIAR TEXTO PLANO, RENDERIZAMOS LA VISTA CON EL ERROR
+            return res.render('verificar-mfa', {
+                title: 'Verificar Segundo Factor - ESPE',
+                error: 'El código introducido es incorrecto o ha expirado. Inténtalo de nuevo.'
+            });
+        }
+
+    } catch (error) {
+        console.error('[ERROR VERIFICACIÓN MFA]:', error);
+        res.render('verificar-mfa', {
+            title: 'Verificar Segundo Factor - ESPE',
+            error: 'Ocurrió un error interno al validar el código.'
+        });
     }
 };
