@@ -74,36 +74,42 @@ exports.loginUsuario = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).send('Todos los campos son obligatorios.');
+        return res.render('login', { title: 'Iniciar Sesión - ESPE', error: 'Todos los campos son obligatorios.' });
     }
 
     try {
         const [usuarios] = await db.query('SELECT * FROM usuarios WHERE email = ?', [email]);
-
+        
+        // 🔄 CAMBIO 1: Si el correo no existe
         if (usuarios.length === 0) {
-            return res.status(400).send('El correo electrónico o la contraseña son incorrectos.');
+            return res.render('login', { 
+                title: 'Iniciar Sesión - ESPE', 
+                error: 'El correo electrónico o la contraseña son incorrectos.' 
+            });
         }
 
         const usuario = usuarios[0];
         const coinciden = await bcrypt.compare(password, usuario.password);
 
+        // 🔄 CAMBIO 2: Si la contraseña no coincide
         if (!coinciden) {
-            return res.status(400).send('El correo electrónico o la contraseña son incorrectos.');
+            return res.render('login', { 
+                title: 'Iniciar Sesión - ESPE', 
+                error: 'El correo electrónico o la contraseña son incorrectos.' 
+            });
         }
 
-        // En lugar de iniciar sesión definitiva, guardamos los datos de forma TEMPORAL
+        // Si todo está bien, continúa el flujo temporal hacia el MFA
         req.session.usuarioIdTemp = usuario.id;
         req.session.usuarioEmailTemp = usuario.email;
         req.session.usuarioNombreTemp = usuario.nombre;
 
         console.log(`[AUDITORÍA] Credenciales correctas para: ${email}. Pasando a verificación MFA.`);
-
-        // Redirigir a la pantalla del código de 6 dígitos
         res.redirect('/verificar-mfa');
 
     } catch (error) {
         console.error('[ERROR LOGIN]:', error);
-        res.status(500).send('Error interno al intentar iniciar sesión.');
+        res.render('login', { title: 'Iniciar Sesión - ESPE', error: 'Error interno al intentar iniciar sesión.' });
     }
 };
 

@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const db = require('./config/db');
 const authController = require('./controllers/authController');
+const passport = require('./config/passport'); // <-- IMPORTAR CONFIGURACIÓN PASSPORT
 
 // Cargar variables de entorno desde el archivo .env
 dotenv.config();
@@ -24,6 +25,9 @@ app.use(session({
         maxAge: 1000 * 60 * 15 // La sesión expira automáticamente en 15 minutos
     }
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Middlewares necesarios para capturar y procesar datos de formularios (POST)
 app.use(cors());
@@ -55,7 +59,15 @@ app.get('/', (req, res) => {
 
 // Renderizar la vista de inicio de sesión
 app.get('/login', (req, res) => {
-    res.render('login', { title: 'Iniciar Sesión - ESPE' });
+    // Si ya tiene sesión definitiva activa, lo mandamos al dashboard
+    if (req.session && req.session.usuarioId) {
+        return res.redirect('/dashboard');
+    }
+    // Pasamos error: null por defecto
+    res.render('login', { 
+        title: 'Iniciar Sesión - ESPE',
+        error: null 
+    });
 });
 
 // Renderizar la vista de registro de usuarios
@@ -105,6 +117,29 @@ app.post('/auth/register', authController.registrarUsuario);
 app.post('/auth/login', authController.loginUsuario);
 
 app.post('/auth/verificar-mfa', authController.verificarMfa);
+
+
+// ==========================================
+// 🚀 RUTAS PARA OAUTH 2.0 (GOOGLE)
+// ==========================================
+
+// 1. Redirigir al usuario a la página de inicio de sesión de Google
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// 2. Ruta de retorno a la que Google envía el perfil del usuario
+app.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    (req, res) => {
+        // El login con Google es tan seguro que los tokens de identidad ya fueron verificados.
+        // Establecemos la sesión definitiva directamente en Express
+        req.session.usuarioId = req.user.id;
+        req.session.usuarioNombre = req.user.nombre;
+        req.session.usuarioEmail = req.user.email;
+
+        console.log(`[AUDITORÍA] Acceso OAuth 2.0 exitoso para: ${req.user.email}`);
+        res.redirect('/dashboard');
+    }
+);
 
 // ==========================================
 //          CONTROL DE ERRORES GLOBAL
