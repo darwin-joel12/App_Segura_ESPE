@@ -53,7 +53,7 @@
                     <span><%= error %></span>
                 </div>
             <% } %>
-            
+
             <button type="submit" 
                 class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-emerald-500 transition-all duration-150 active:scale-[0.98]">
                 Ingresar al Sistema
@@ -77,6 +77,92 @@
                 <a href="/register" class="font-medium text-emerald-400 hover:text-emerald-300 transition-colors ml-1">Regístrate aquí</a>
             </p>
         </div>
+
+        <div class="relative my-6">
+            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-700"></div></div>
+            <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-800 px-2 text-slate-400">Entorno Centralizado (Kerberos)</span></div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-700/50 rounded-xl p-4 space-y-3">
+            <p class="text-xs text-slate-400 text-center">Simulador de Single Sign-On (SSO) mediante KDC</p>
+            <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="solicitarTicketKerberos()" 
+                    class="py-2 px-3 text-xs font-medium rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-all text-center">
+                    1. Emitir Ticket KDC
+                </button>
+                <button type="button" id="btnAccesoSSO" onclick="enviarTicketSSO()" disabled
+                    class="py-2 px-3 text-xs font-medium rounded-lg bg-slate-700 text-slate-400 cursor-not-allowed transition-all text-center">
+                    2. Acceder con Ticket
+                </button>
+            </div>
+            <div id="statusKerberos" class="text-[11px] text-center text-slate-500 italic">No se ha solicitado ningún ticket.</div>
+        </div>
+
+        <script>
+            let ticketAlmacenadoLocalmente = null;
+
+            async function solicitarTicketKerberos() {
+                const statusDiv = document.getElementById('statusKerberos');
+                const btnAcceso = document.getElementById('btnAccesoSSO');
+                
+                // 👁️ TOMAMOS EL CORREO QUE ESTÁ ESCRITO EN TU INPUT REAL DE LOGIN
+                const emailInput = document.getElementById('email').value;
+
+                if (!emailInput) {
+                    statusDiv.className = "text-[11px] text-center text-amber-400 font-medium";
+                    statusDiv.innerText = "⚠️ Por favor, escribe primero tu correo en el campo de arriba.";
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/kdc/solicitar-ticket', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: emailInput }) // Enviamos el correo real escrito
+                    });
+                    const resData = await response.json();
+                    
+                    if (resData.success) {
+                        ticketAlmacenadoLocalmente = resData.ticket;
+                        statusDiv.className = "text-[11px] text-center text-emerald-400 font-medium";
+                        statusDiv.innerText = "🎟️ Ticket KDC emitido para tu usuario. Contraseña omitida.";
+                        btnAcceso.removeAttribute('disabled');
+                        btnAcceso.className = "py-2 px-3 text-xs font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer transition-all";
+                    } else {
+                        statusDiv.className = "text-[11px] text-center text-rose-400 font-medium";
+                        statusDiv.innerText = "❌ KDC Denegado: " + resData.message;
+                        btnAcceso.setAttribute('disabled', 'true');
+                        btnAcceso.className = "py-2 px-3 text-xs font-medium rounded-lg bg-slate-700 text-slate-400 cursor-not-allowed";
+                    }
+                } catch (error) { 
+                    statusDiv.innerText = "Error con el KDC."; 
+                }
+            }
+            async function enviarTicketSSO() {
+                const statusDiv = document.getElementById('statusKerberos');
+                
+                if (!ticketAlmacenadoLocalmente) return;
+
+                try {
+                    const response = await fetch('/auth/kerberos-login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ticket: ticketAlmacenadoLocalmente })
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        statusDiv.innerText = "Validación exitosa. Redirigiendo...";
+                        window.location.href = data.redirect;
+                    } else {
+                        statusDiv.className = "text-[11px] text-center text-rose-400 font-medium";
+                        statusDiv.innerText = "❌ Denegado: " + data.message;
+                    }
+                } catch (error) {
+                    statusDiv.innerText = "Error al validar el ticket.";
+                }
+            }
+        </script>
         
     </div>
 

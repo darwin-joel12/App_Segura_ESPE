@@ -1,3 +1,4 @@
+const crypto = require('crypto'); // 👈 ¡AÑADE ESTA LÍNEA AL INICIO DE APP.JS!
 const express = require('express');
 const session = require('express-session'); // <-- 1. AGREGA ESTA IMPORTACIÓN
 const dotenv = require('dotenv');
@@ -140,6 +141,98 @@ app.get('/auth/google/callback',
         res.redirect('/dashboard');
     }
 );
+
+const { generarTicketKerberos, validarTicketKerberos } = require('./config/kdc');
+// Memoria volátil temporal para guardar los Nonces usados y prevenir ataques de repetición (Replay Attacks)
+const registrosNoncesUsados = new Set();
+
+// ======================================================================
+// 🎟️ ACTIVIDAD 3: ENDPOINTS DE AUTENTICACIÓN CENTRALIZADA (KERBEROS)
+// ======================================================================
+
+// 1. Endpoint Real del KDC vinculado a MySQL
+app.post('/kdc/solicitar-ticket', async (req, res) => {
+    const { email } = req.body; // El cliente solo envía el correo con el que quiere hacer SSO
+
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'El correo electrónico es obligatorio.' });
+    }
+
+    try {
+        // El KDC consulta a la base de datos de XAMPP si el usuario existe
+        const [usuarios] = await db.query('SELECT id, nombre, email FROM usuarios WHERE email = ?', [email]);
+
+        if (usuarios.length === 0) {
+            console.log(`[AUDITORÍA KDC ALERT]: Solicitud de ticket denegada. El correo ${email} no está registrado.`);
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado en el sistema centralizado.' });
+        }
+
+        const usuarioReal = usuarios[0];
+
+        // Construimos el Ticket con los datos VERDADEROS de la base de datos
+        const ticketPayload = {
+            usuarioId: usuarioReal.id,
+            nombre: usuarioReal.nombre,
+            email: usuarioReal.email,
+            timestamp: Date.now(),
+            nonce: crypto.randomBytes(8).toString('hex')
+        };
+
+        // Ciframos el ticket con la clave maestra compartida
+        const ticketCifrado = generarTicketKerberos(ticketPayload);
+
+        console.log(`[AUDITORÍA KDC]: Ticket Kerberos (TGS_REP) emitido con éxito para el usuario real: ${usuarioReal.email}`);
+        res.json({ success: true, ticket: ticketCifrado });
+
+    } catch (error) {
+        console.error('[ERROR KDC CONTRACT]:', error);
+        res.status(500).json({ success: false, message: 'Error interno en el KDC.' });
+    }
+});
+
+// 2. Endpoint de tu Aplicación que recibe y valida el ticket para dar acceso SSO
+app.post('/auth/kerberos-login', (req, res) => {
+    const { ticket } = req.body;
+
+    if (!ticket) {
+        return res.status(400).json({ success: false, message: 'No se proporcionó ningún ticket de Kerberos.' });
+    }
+
+    // El servidor intenta descifrar el ticket usando la clave compartida con el KDC
+    const ticketDescifrado = validarTicketKerberos(ticket);
+
+    if (!ticketDescifrado) {
+        return res.status(401).json({ success: false, message: 'Ticket inválido o manipulado criptográficamente.' });
+    }
+
+    const { usuarioId, nombre, email, timestamp, nonce } = ticketDescifrado;
+    const tiempoActual = Date.now();
+    const cincoMinutos = 5 * 60 * 1000;
+
+    // 🛑 PROCESO 3: PREVENCIÓN DE ATAQUES DE REPETICIÓN (REPLAY ATTACK)
+    // Regla A: Verificar si el ticket ya expiró por tiempo (Margen de 5 minutos reglamentario de Kerberos)
+    if (tiempoActual - timestamp > cincoMinutos) {
+        console.log(`[AUDITORÍA ALERT]: Intento de acceso con Ticket expirado. Usuario: ${email}`);
+        return res.status(401).json({ success: false, message: 'El ticket de Kerberos ha expirado (Superó los 5 minutos).' });
+    }
+
+    // Regla B: Verificar si el identificador único (Nonce) ya fue interceptado y reutilizado antes
+    if (registrosNoncesUsados.has(nonce)) {
+        console.log(`[AUDITORÍA REPLAY ATTACK]: ¡Ataque de repetición detectado! Reutilización del nonce: ${nonce}`);
+        return res.status(401).json({ success: false, message: 'Ataque de repetición detectado. Este ticket ya fue usado.' });
+    }
+
+    // Si pasa las dos reglas, registramos el nonce para quemar el ticket y que no se vuelva a usar
+    registrosNoncesUsados.add(nonce);
+
+    // 🚪 ACCESO SEGURO SIN REENVÍO DE CREDENCIALES: Creamos la sesión definitiva en Express
+    req.session.usuarioId = usuarioId;
+    req.session.usuarioNombre = nombre;
+    req.session.usuarioEmail = email;
+
+    console.log(`[AUDITORÍA SSO]: Acceso concedido vía Kerberos Ticket para: ${email}. Contraseña no requerida.`);
+    res.json({ success: true, redirect: '/dashboard' });
+});
 
 // ==========================================
 //          CONTROL DE ERRORES GLOBAL
