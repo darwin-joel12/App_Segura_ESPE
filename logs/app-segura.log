@@ -1,0 +1,30 @@
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"ataque_repeticion_detectado","modulo":"kerberos_app","email":"test@espe.edu.ec","nonce":"7aba0d1dd9d4b9dd","mensaje":"¡ALERTA DE SEGURIDAD!: Se interceptó un intento de reutilización de ticket criptográfico (Replay Attack)."}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"ticket_kdc_denegado","modulo":"kerberos_kdc","email":"guagchingadarwin14@gmail.com","mensaje":"Solicitud de ticket denegada. El correo electrónico no existe en el sistema centralizado."}
+{"evento":"ticket_kdc_denegado","modulo":"kerberos_kdc","email":"guagchingadarwin14@gmail.com","mensaje":"Solicitud de ticket denegada. El correo electrónico no existe en el sistema centralizado."}
+login_exitoso_sso - Credenciales correctas para: test@espe.edu.ec
+Verificacion MFA exitosa para usuario ID: 2
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+login_exitoso_sso - Credenciales correctas para: test@espe.edu.ec
+ataque_repeticion_detectado - Intento fallido de codigo MFA para usuario ID: 2
+ataque_repeticion_detectado - Intento fallido de codigo MFA para usuario ID: 2
+ataque_repeticion_detectado - Intento fallido de codigo MFA para usuario ID: 2
+ataque_repeticion_detectado - Intento fallido de codigo MFA para usuario ID: 2
+ataque_repeticion_detectado - Intento fallido de codigo MFA para usuario ID: 2
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}

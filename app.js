@@ -7,6 +7,7 @@ const path = require('path');
 const db = require('./config/db');
 const authController = require('./controllers/authController');
 const passport = require('./config/passport'); // <-- IMPORTAR CONFIGURACIÓN PASSPORT
+const logger = require('./config/logger'); // 👈 Importación del motor de logs profesional para el SIEM
 
 // Cargar variables de entorno desde el archivo .env
 dotenv.config();
@@ -85,13 +86,29 @@ app.get('/dashboard', verificarAutenticacion, (req, res) => {
 
 // Ruta para Cerrar Sesión de forma segura (Destrucción en Servidor)
 app.get('/logout', (req, res) => {
+    const usuarioEmail = req.session.usuarioEmail || 'Desconocido';
+
     req.session.destroy((err) => {
         if (err) {
-            console.error('[ERROR LOGOUT]:', err);
+            // 🚨 SIEM: Registro de error crítico al intentar destruir sesión
+            logger.error({
+                evento: 'error_logout',
+                modulo: 'autenticacion',
+                error: err.message,
+                mensaje: 'Fallo crítico al intentar destruir la sesión en el servidor.'
+            });
             return res.status(500).send('Error al cerrar la sesión.');
         }
         res.clearCookie('connect.sid'); // Borra la cookie del navegador por seguridad
-        console.log('[AUDITORÍA] Sesión finalizada correctamente por el usuario.');
+        
+        // 📝 SIEM: Registro de auditoría ordinaria de cierre de sesión
+        logger.info({
+            evento: 'logout_exitoso',
+            modulo: 'autenticacion',
+            email: usuarioEmail,
+            mensaje: 'Sesión finalizada correctamente por el usuario.'
+        });
+        
         res.redirect('/login'); // Redirige al login vacío
     });
 });
@@ -137,7 +154,15 @@ app.get('/auth/google/callback',
         req.session.usuarioNombre = req.user.nombre;
         req.session.usuarioEmail = req.user.email;
 
-        console.log(`[AUDITORÍA] Acceso OAuth 2.0 exitoso para: ${req.user.email}`);
+        // 📝 SIEM: Registro de éxito de inicio de sesión de tercero (OAuth 2.0)
+        logger.info({
+            evento: 'login_exitoso_oauth',
+            modulo: 'oauth2_google',
+            email: req.user.email,
+            proveedor: 'Google Cloud Console',
+            mensaje: 'Acceso OAuth 2.0 verificado y concedido de forma transparente.'
+        });
+
         res.redirect('/dashboard');
     }
 );
@@ -163,7 +188,13 @@ app.post('/kdc/solicitar-ticket', async (req, res) => {
         const [usuarios] = await db.query('SELECT id, nombre, email FROM usuarios WHERE email = ?', [email]);
 
         if (usuarios.length === 0) {
-            console.log(`[AUDITORÍA KDC ALERT]: Solicitud de ticket denegada. El correo ${email} no está registrado.`);
+            // 🚨 SIEM: Solicitud de ticket para un usuario inexistente (Alerta potencial de escaneo)
+            logger.warn({
+                evento: 'ticket_kdc_denegado',
+                modulo: 'kerberos_kdc',
+                email: email,
+                mensaje: 'Solicitud de ticket denegada. El correo electrónico no existe en el sistema centralizado.'
+            });
             return res.status(404).json({ success: false, message: 'Usuario no encontrado en el sistema centralizado.' });
         }
 
@@ -181,11 +212,24 @@ app.post('/kdc/solicitar-ticket', async (req, res) => {
         // Ciframos el ticket con la clave maestra compartida
         const ticketCifrado = generarTicketKerberos(ticketPayload);
 
-        console.log(`[AUDITORÍA KDC]: Ticket Kerberos (TGS_REP) emitido con éxito para el usuario real: ${usuarioReal.email}`);
+        // 📝 SIEM: Registro de emisión de un TGS_REP legítimo
+        logger.info({
+            evento: 'ticket_kdc_emitido',
+            modulo: 'kerberos_kdc',
+            email: usuarioReal.email,
+            mensaje: 'Ticket Kerberos cifrado simétricamente emitido con éxito.'
+        });
+
         res.json({ success: true, ticket: ticketCifrado });
 
     } catch (error) {
-        console.error('[ERROR KDC CONTRACT]:', error);
+        // 🚨 SIEM: Error de procesamiento en base de datos interna o criptografía
+        logger.error({
+            evento: 'error_interno_kdc',
+            modulo: 'kerberos_kdc',
+            error: error.message,
+            mensaje: 'Fallo crítico en el procesamiento del controlador de tickets KDC.'
+        });
         res.status(500).json({ success: false, message: 'Error interno en el KDC.' });
     }
 });
@@ -202,6 +246,12 @@ app.post('/auth/kerberos-login', (req, res) => {
     const ticketDescifrado = validarTicketKerberos(ticket);
 
     if (!ticketDescifrado) {
+        // 🚨 SIEM: Intento de bypass con un ticket corrupto o alterado
+        logger.error({
+            evento: 'ticket_kerberos_invalido',
+            modulo: 'kerberos_app',
+            mensaje: 'Intento de login SSO fallido. El ticket no pudo ser descifrado (Clave incorrecta o alteración).'
+        });
         return res.status(401).json({ success: false, message: 'Ticket inválido o manipulado criptográficamente.' });
     }
 
@@ -212,13 +262,26 @@ app.post('/auth/kerberos-login', (req, res) => {
     // 🛑 PROCESO 3: PREVENCIÓN DE ATAQUES DE REPETICIÓN (REPLAY ATTACK)
     // Regla A: Verificar si el ticket ya expiró por tiempo (Margen de 5 minutos reglamentario de Kerberos)
     if (tiempoActual - timestamp > cincoMinutos) {
-        console.log(`[AUDITORÍA ALERT]: Intento de acceso con Ticket expirado. Usuario: ${email}`);
+        // 🚨 SIEM: Alerta de ticket obsoleto (Posible reenvío tardío)
+        logger.warn({
+            evento: 'ticket_kerberos_expirado',
+            modulo: 'kerberos_app',
+            email: email,
+            mensaje: 'Intento de acceso denegado. El ticket de Kerberos superó la ventana de tiempo de 5 minutos.'
+        });
         return res.status(401).json({ success: false, message: 'El ticket de Kerberos ha expirado (Superó los 5 minutos).' });
     }
 
     // Regla B: Verificar si el identificador único (Nonce) ya fue interceptado y reutilizado antes
     if (registrosNoncesUsados.has(nonce)) {
-        console.log(`[AUDITORÍA REPLAY ATTACK]: ¡Ataque de repetición detectado! Reutilización del nonce: ${nonce}`);
+        // 🚨 SIEM [CRÍTICO]: Alerta de Replay Attack detectada en tiempo real. Wazuh disparará una regla de alta severidad aquí.
+        logger.error({
+            evento: 'ataque_repeticion_detectado',
+            modulo: 'kerberos_app',
+            email: email,
+            nonce: nonce,
+            mensaje: '¡ALERTA DE SEGURIDAD!: Se interceptó un intento de reutilización de ticket criptográfico (Replay Attack).'
+        });
         return res.status(401).json({ success: false, message: 'Ataque de repetición detectado. Este ticket ya fue usado.' });
     }
 
@@ -230,7 +293,14 @@ app.post('/auth/kerberos-login', (req, res) => {
     req.session.usuarioNombre = nombre;
     req.session.usuarioEmail = email;
 
-    console.log(`[AUDITORÍA SSO]: Acceso concedido vía Kerberos Ticket para: ${email}. Contraseña no requerida.`);
+    // 📝 SIEM: Acceso concedido vía SSO exitoso
+    logger.info({
+        evento: 'login_exitoso_sso',
+        modulo: 'kerberos_app',
+        email: email,
+        mensaje: 'Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red.'
+    });
+
     res.json({ success: true, redirect: '/dashboard' });
 });
 
@@ -238,11 +308,25 @@ app.post('/auth/kerberos-login', (req, res) => {
 //          CONTROL DE ERRORES GLOBAL
 // ==========================================
 app.use((err, req, res, next) => {
-    console.error(`[ERROR LOG] ${new Date().toISOString()} - ${err.message}`);
+    // 🚨 SIEM: Captura unificada de Information Disclosure (Ocultamiento de trazas técnicas al usuario)
+    logger.error({
+        evento: 'error_no_controlado',
+        modulo: 'servidor_global',
+        error: err.message,
+        ruta: req.originalUrl,
+        metodo: req.method
+    });
     res.status(500).send('Error interno en el servidor seguro.');
 });
 
 // Levantar el servidor en el puerto especificado
-app.listen(PORT, () => {
-    console.log(`[INFO] Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    // 📝 SIEM: Registro de inicialización de la infraestructura del backend
+    logger.info({
+        evento: 'inicio_servidor',
+        modulo: 'infraestructura',
+        mensaje: `Servidor seguro de la aplicación corriendo correctamente en el puerto: ${PORT}`
+    });
+    // 🚀 CONSOLA: Enlace limpio tradicional para desarrollo rápido (Ctrl + Clic)
+     console.log(`[INFO] Servidor corriendo en http://localhost:${PORT}`);
 });
