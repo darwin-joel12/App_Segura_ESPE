@@ -2,7 +2,7 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
-const logger = require('../config/logger'); // 👈 Importación obligatoria
+const logger = require('../config/logger');
 
 exports.registrarUsuario = async (req, res) => {
     const { nombre, email, password } = req.body;
@@ -21,17 +21,32 @@ exports.registrarUsuario = async (req, res) => {
             [nombre, email, hashedPassword, mfaSecret.base32]
         );
 
-        logger.info(`Nuevo usuario registrado con exito: ${email}`);
+        logger.info({
+            evento: 'registro_usuario_exitoso',
+            modulo: 'autenticacion',
+            email: email,
+            mensaje: 'Nuevo usuario registrado con éxito.'
+        });
 
         qrcode.toDataURL(mfaSecret.otpauth_url, (err, data_url) => {
             if (err) {
-                logger.error(`[ERROR GENERACION QR]: ${err.message}`);
+                logger.error({
+                    evento: 'error_generacion_qr',
+                    modulo: 'autenticacion',
+                    error: err.message,
+                    mensaje: 'Error al generar el QR de seguridad.'
+                });
                 return res.status(500).send('Error al generar el QR de seguridad.');
             }
             res.render('mfa-setup', { title: 'Configurar Segundo Factor - ESPE', qrCodeUrl: data_url, secret: mfaSecret.base32 });
         });
     } catch (error) {
-        logger.error(`[ERROR CRITICO EN REGISTRO]: ${error.message}`);
+        logger.error({
+            evento: 'error_no_controlado',
+            modulo: 'autenticacion',
+            error: error.message,
+            mensaje: 'Error crítico en registro de usuario.'
+        });
         res.status(500).send('Error interno al procesar el registro del usuario.');
     }
 };
@@ -51,11 +66,20 @@ exports.loginUsuario = async (req, res) => {
         req.session.usuarioEmailTemp = usuario.email;
         req.session.usuarioNombreTemp = usuario.nombre;
 
-        // 📝 Hace match exacto con tu regla de auditoría 100102
-        logger.info(`login_exitoso_sso - Credenciales correctas para: ${email}`);
+        logger.info({
+            evento: 'login_password_ok',
+            modulo: 'autenticacion',
+            email: email,
+            mensaje: 'Credenciales correctas, pendiente verificación MFA.'
+        });
         res.redirect('/verificar-mfa');
     } catch (error) {
-        logger.error(`[ERROR LOGIN]: ${error.message}`);
+        logger.error({
+            evento: 'error_no_controlado',
+            modulo: 'autenticacion',
+            error: error.message,
+            mensaje: 'Error interno al intentar iniciar sesión.'
+        });
         res.render('login', { title: 'Iniciar Sesión - ESPE', error: 'Error interno al intentar iniciar sesión.' });
     }
 };
@@ -73,7 +97,7 @@ exports.verificarMfa = async (req, res) => {
             secret: usuario.mfa_secret,
             encoding: 'base32',
             token: codigoMfa,
-            window: 1 
+            window: 1
         });
 
         if (verificado) {
@@ -82,15 +106,29 @@ exports.verificarMfa = async (req, res) => {
             req.session.usuarioEmail = req.session.usuarioEmailTemp;
             delete req.session.usuarioIdTemp;
 
-            logger.info(`Verificacion MFA exitosa para usuario ID: ${usuarioId}`);
+            logger.info({
+                evento: 'mfa_verificado_exitoso',
+                modulo: 'autenticacion',
+                usuarioId: usuarioId,
+                mensaje: 'Verificación MFA exitosa.'
+            });
             res.redirect('/dashboard');
         } else {
-            // 🚨 ¡ALERTA CRÍTICA!: Esto inyecta el log que activará tu regla 100105
-            logger.error(`ataque_repeticion_detectado - Intento fallido de codigo MFA para usuario ID: ${usuarioId}`);
+            logger.error({
+                evento: 'mfa_fallido',
+                modulo: 'autenticacion',
+                usuarioId: usuarioId,
+                mensaje: 'Código MFA incorrecto o expirado.'
+            });
             return res.render('verificar-mfa', { title: 'Verificar Segundo Factor - ESPE', error: 'El código introducido es incorrecto o ha expirado.' });
         }
     } catch (error) {
-        logger.error(`[ERROR VERIFICACION MFA]: ${error.message}`);
+        logger.error({
+            evento: 'error_no_controlado',
+            modulo: 'autenticacion',
+            error: error.message,
+            mensaje: 'Error interno al validar el código MFA.'
+        });
         res.render('verificar-mfa', { title: 'Verificar Segundo Factor - ESPE', error: 'Ocurrió un error interno al validar el código.' });
     }
 };

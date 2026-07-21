@@ -28,3 +28,67 @@ ataque_repeticion_detectado - Intento fallido de codigo MFA para usuario ID: 2
 {"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
 {"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
 {"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"login_password_ok","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Credenciales correctas, pendiente verificación MFA."}
+{"evento":"mfa_verificado_exitoso","modulo":"autenticacion","usuarioId":2,"mensaje":"Verificación MFA exitosa."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"login_password_ok","modulo":"autenticacion","email":"test2@espe.edu.ec","mensaje":"Credenciales correctas, pendiente verificación MFA."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":3,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":3,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":3,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":3,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_verificado_exitoso","modulo":"autenticacion","usuarioId":3,"mensaje":"Verificación MFA exitosa."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test2@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"login_password_ok","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Credenciales correctas, pendiente verificación MFA."}
+{"evento":"mfa_verificado_exitoso","modulo":"autenticacion","usuarioId":2,"mensaje":"Verificación MFA exitosa."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"login_password_ok","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Credenciales correctas, pendiente verificación MFA."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_verificado_exitoso","modulo":"autenticacion","usuarioId":2,"mensaje":"Verificación MFA exitosa."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test2@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test2@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test2@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"login_exitoso_oauth","modulo":"oauth2_google","email":"djglema@gmail.com","proveedor":"Google Cloud Console","mensaje":"Acceso OAuth 2.0 verificado y concedido de forma transparente."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"djglema@gmail.com","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"login_password_ok","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Credenciales correctas, pendiente verificación MFA."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_verificado_exitoso","modulo":"autenticacion","usuarioId":2,"mensaje":"Verificación MFA exitosa."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test2@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test2@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"ataque_repeticion_detectado","modulo":"kerberos_app","email":"test2@espe.edu.ec","nonce":"caa988641d97f844","mensaje":"¡ALERTA DE SEGURIDAD!: Se interceptó un intento de reutilización de ticket criptográfico (Replay Attack)."}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"login_password_ok","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Credenciales correctas, pendiente verificación MFA."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_verificado_exitoso","modulo":"autenticacion","usuarioId":2,"mensaje":"Verificación MFA exitosa."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test2@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test2@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"test2@espe.edu.ec","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"test2@espe.edu.ec","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test2@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
+{"evento":"ticket_kdc_emitido","modulo":"kerberos_kdc","email":"djglema@gmail.com","mensaje":"Ticket Kerberos cifrado simétricamente emitido con éxito."}
+{"evento":"login_exitoso_sso","modulo":"kerberos_app","email":"djglema@gmail.com","mensaje":"Acceso centralizado concedido vía Kerberos Ticket. Credenciales omitidas en red."}
+{"evento":"ataque_repeticion_detectado","modulo":"kerberos_app","email":"djglema@gmail.com","nonce":"4909c012940e2eba","mensaje":"¡ALERTA DE SEGURIDAD!: Se interceptó un intento de reutilización de ticket criptográfico (Replay Attack)."}
+{"evento":"login_password_ok","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Credenciales correctas, pendiente verificación MFA."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"mfa_fallido","modulo":"autenticacion","usuarioId":2,"mensaje":"Código MFA incorrecto o expirado."}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"inicio_servidor","modulo":"infraestructura","mensaje":"Servidor seguro de la aplicación corriendo correctamente en el puerto: 3000"}
+{"evento":"login_password_ok","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Credenciales correctas, pendiente verificación MFA."}
+{"evento":"mfa_verificado_exitoso","modulo":"autenticacion","usuarioId":2,"mensaje":"Verificación MFA exitosa."}
+{"evento":"logout_exitoso","modulo":"autenticacion","email":"test@espe.edu.ec","mensaje":"Sesión finalizada correctamente por el usuario."}
